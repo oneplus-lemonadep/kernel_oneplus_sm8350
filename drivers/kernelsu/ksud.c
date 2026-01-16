@@ -84,6 +84,7 @@ static void stop_input_hook(void);
 bool ksu_init_rc_hook __read_mostly = true;
 bool ksu_execveat_hook __read_mostly = true;
 bool ksu_input_hook __read_mostly = true;
+bool ksu_vfs_read_hook __read_mostly = false;
 #endif // #ifndef CONFIG_KSU_SUSFS
 
 // Detect whether it is on or not
@@ -587,6 +588,18 @@ int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code,
 			stop_input_hook();
 		}
 	}
+
+	return 0;
+}
+
+int ksu_handle_vfs_read(struct file **file_ptr, char __user **buf_ptr,
+			size_t *count_ptr, loff_t **pos)
+{
+#if defined(CONFIG_KSU_MANUAL_HOOK) || defined(CONFIG_KSU_SUSFS)
+	if (!ksu_vfs_read_hook) {
+		return 0;
+	}
+#endif // #ifndef CONFIG_KSU_SUSFS
 
 	return 0;
 }
